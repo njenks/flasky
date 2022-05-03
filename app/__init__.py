@@ -1,8 +1,22 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy() # creating new DB obj - we can import db into other files because outside of method
+migrate = Migrate() # creating new migrate obj
 
 def create_app():
     # __name__ stores the name of the module we're in
     app = Flask(__name__)
+
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
+    # telling sqlalchemy where our db is located
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/hello_cars_development' 
+
+    db.init_app(app) # hooking up db and app - connecting objs to flask server
+    migrate.init_app(app, db) # hooking up migrate and app - connecting objs to flask server
+
+    from .models.cars import Car # db and migration able to know that it exists 
 
     from .routes.cars import cars_bp # getting Blueprint
     app.register_blueprint(cars_bp) # telling app about Blueprint
