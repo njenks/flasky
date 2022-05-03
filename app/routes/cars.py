@@ -55,22 +55,71 @@ def get_all_cars():
     # with lists, explicity have to use jsonify to return JSON obj  - good idea to always use it, just in case 
 
 
-# @cars_bp.route("/<car_id>", methods=["GET"])
-# def get_one_car(car_id): # making var that needs same exact name as route 
-#     try: 
-#         car_id = int(car_id) 
-#     except ValueError: 
-#         return jsonify({"msg":f"car {car_id} invalid. ID must be an integer"}, 400)
+@cars_bp.route("/<car_id>", methods=["GET"])
+def get_one_car(car_id): # making var that needs same exact name as route 
+    try: 
+        car_id = int(car_id) 
+    except ValueError: 
+        return jsonify({"msg":f"car {car_id} invalid. ID must be an integer"}, 400)
+    
+    chosen_car = Car.query.get(car_id)
 
-#     chosen_car = None
-#     for car in cars:
-#         if car.id == car_id:
-#             chosen_car = {
-#                 "id": car.id, 
-#                 "driver": car.driver, 
-#                 "team": car.team, 
-#                 "mass_kg": car.mass_kg
-#             }
-#     if chosen_car is None: 
-#         return jsonify({"msg":f"car {car_id} not found"}, 404)
-#     return jsonify(chosen_car), 200 # returns status code as well 
+    if chosen_car is None: 
+        return jsonify({"msg":f"car {car_id} not found"}, 404)
+
+    return jsonify({
+                "id": chosen_car.id, 
+                "driver": chosen_car.driver, 
+                "team": chosen_car.team, 
+                "mass_kg": chosen_car.mass_kg
+            }), 200 # returns status code as well 
+
+
+@cars_bp.route("/<car_id>", method=["PUT"])
+def update_car(car_id): 
+    try: 
+        car_id = int(car_id) 
+    except ValueError: 
+        return jsonify({"msg":f"car {car_id} invalid. ID must be an integer"}, 400)
+    
+    request_body = request.get_json() # dict with k, v that were in JSON
+
+    if "driver" not in request_body or \
+        "team" not in request_body or \
+        "mass_kg" not in request_body: 
+        return jsonify({'msg': f"Request must include driver, team, and mass_kg"}), 400 
+
+    chosen_car = Car.query.get(car_id)
+
+    if chosen_car is None: 
+        return jsonify({"msg":f"car {car_id} not found"}, 404)
+
+    chosen_car.driver = request_body["driver"]
+    chosen_car.team = request_body["team"]
+    chosen_car.mass_kg = request_body["mass_kg"]
+
+    db.session.commit() 
+
+    return jsonify({'msg': f"Successfully replaced car with id {car_id}"}), 200 
+
+@cars_bp.route("/<car_id>", method=["DELETE"])
+def delete_car(car_id):
+    try: 
+        car_id = int(car_id) 
+    except ValueError: 
+        return jsonify({"msg":f"car {car_id} invalid. ID must be an integer"}, 400)
+    
+    chosen_car = Car.query.get(car_id)
+
+    if chosen_car is None: 
+        return jsonify({"msg":f"car {car_id} not found"}, 404)
+    
+    db.session.delete(chosen_car)
+    db.session.commit() # any time making changes you want to save 
+
+    return jsonify({'msg': f"Car #{car_id} successfully deleted"})
+
+
+
+
+    
