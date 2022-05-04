@@ -1,17 +1,23 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv # function that loads dotenv ****
+import os # import *****
 
 db = SQLAlchemy() # creating new DB obj - we can import db into other files because outside of method
 migrate = Migrate() # creating new migrate obj
+load_dotenv()
 
-def create_app():
+def create_app(testing = False): # ****
     # __name__ stores the name of the module we're in
     app = Flask(__name__)
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
-    # telling sqlalchemy where our db is located
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/hello_cars_development' 
+    if testing == {"testing": True}:
+        # telling sqlalchemy where our db is located
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('SQLALCHEMY_TESTING_DATABASE_URI') # *****
+    else: 
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('SQLALCHEMY_DATABASE_URI')# *****
 
     db.init_app(app) # hooking up db and app - connecting objs to flask server
     migrate.init_app(app, db) # hooking up migrate and app - connecting objs to flask server

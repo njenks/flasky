@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request 
-
 from app import db 
 from app.models.cars import Car
 
@@ -40,8 +39,27 @@ def create_car():
 @cars_bp.route("", methods=["GET"]) # can add more methods if need be 
 # decorator changes what def get_all_cars() does 
 def get_all_cars():
-    response = [] 
-    cars = Car.query.all() # asking postgres to get all information for us
+    params = request.args # can use anything as param - obj attr 
+    if "driver" in params and "team" in params: 
+        driver_query = params["driver"]
+        team_query = params["team"]
+        cars = Car.query.filter_by(driver=driver_query, team=team_query)
+
+    if "driver" in params: 
+        driver_query = params["driver"]
+        cars = Car.query.filter_by(driver=driver_query)
+        driver_query = request.args.get("driver")
+    elif "team" in params:
+        team_query = params["team"]
+        cars = Car.query.filter_by(team=team_query)
+        team_query = request.args.get("team")
+    else: 
+        cars = Car.query.all() 
+    # if driver_query:
+    #     cars = Car.query.filter_by(driver=driver_query)
+    # else:
+    #     cars = Car.query.all()
+    response = []
     for car in cars: 
         response.append(
             {
@@ -118,8 +136,3 @@ def delete_car(car_id):
     db.session.commit() # any time making changes you want to save 
 
     return jsonify({'msg': f"Car #{car_id} successfully deleted"})
-
-
-
-
-    
