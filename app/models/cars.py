@@ -2,6 +2,14 @@ from app import db
 
 class Car(db.Model): 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True) # PK
-    driver = db.Column(db.String)
-    team = db.Column(db.String)
+    driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'))
     mass_kg = db.Column(db.Integer)
+    driver = db.relationship("Driver", back_populates="cars")
+
+def to_dict(self):
+    return { 
+        "id": self.id, 
+        "driver": self.driver.name,
+        "mass_kg": self.mass_kg, 
+        "team": self.driver.team
+    }

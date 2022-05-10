@@ -10,8 +10,8 @@ def create_car():
     request_body = request.get_json()
 
     new_car = Car(
-        driver=request_body["driver"],
-        team=request_body["team"],
+        driver_id=request_body["driver_id"],
+        # team=request_body["team"],
         mass_kg=request_body["mass_kg"]
     )
 
@@ -49,12 +49,7 @@ def get_one_car(car_id):
     if chosen_car is None:
         return jsonify({'msg': f'Could not find car with id {car_id}'}), 404 
             
-    return jsonify({
-        "id": chosen_car.id,
-        "driver": chosen_car.driver,
-        "team": chosen_car.team,
-        "mass_kg": chosen_car.mass_kg
-    })
+    return jsonify(chosen_car.to_dict())
     
 @cars_bp.route("/<car_id>", methods=["PUT"])
 def replace_one_car(car_id):
@@ -75,8 +70,6 @@ def replace_one_car(car_id):
     if chosen_car is None:
         return jsonify({'msg': f'Could not find car with id {car_id}'}), 404
 
-    chosen_car.driver = request_body["driver"]
-    chosen_car.team = request_body["team"]
     chosen_car.mass_kg = request_body["mass_kg"]
 
     db.session.commit()

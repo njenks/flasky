@@ -24,8 +24,12 @@ def create_app(testing = None):
     migrate.init_app(app, db) # hooking up migrate and app - connecting objs to flask server
 
     from .models.cars import Car # db and migration able to know that it exists 
+    from .models.drivers import Driver 
 
     from .routes.cars import cars_bp # getting Blueprint
     app.register_blueprint(cars_bp) # telling app about Blueprint
+
+    from .routes.driver_routes import drivers_bp
+    app.register_blueprint(drivers_bp)
 
     return app # flask automatically finds function, then it can get something back
