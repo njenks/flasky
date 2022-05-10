@@ -13,3 +13,9 @@ def to_dict(self):
         "mass_kg": self.mass_kg, 
         "team": self.driver.team
     }
+
+def to_dict_basic(self):
+    return {
+        "id": self.id, 
+        "mass_kg": self.mass_kg
+    }

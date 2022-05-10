@@ -9,10 +9,15 @@ class Driver(db.Model):
     cars = db.relationship("Car", back_populates="driver") 
 
     def to_dict(self):
+        cars_list = []
+        for car in self.cars:
+            cars_list.append(car.to_dict_basic())
+
         return {
             "id": self.id, 
             "name": self.name, 
             "team": self.team, 
             "country": self.country,
-            "handsome": self.handsome
+            "handsome": self.handsome, 
+            "cars": cars_list
         }
